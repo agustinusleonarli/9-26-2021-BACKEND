@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
+use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 
 {
     public function register(Request $request) {
         $fields = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confirmed'
+            'name' => 'required|string|unique:users,name',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|confirmed|min:8',
+            // 'mahasiswa_id' => $id[0]->id
+
         ]);
 
         $user = User::create([
@@ -25,7 +29,7 @@ class AuthController extends Controller
         $token = $user->createToken('myapptoken')->plainTextToken;
 
         $response = [
-            'message' => 'succes',
+            'message' => 'Succes, Silahkan Pergi Ke Menu Login',
             'user' => $user,
             // 'token' => $token
         ];
@@ -44,9 +48,12 @@ class AuthController extends Controller
 
         // Check password
         if(!$user || !Hash::check($fields['password'], $user->password)) {
-            return response([
-                'message' => 'Invalid Credentials, Recheck Email and Password'
-            ], 401);
+            // return response([
+            //     'message' => 'Invalid Credentials, Recheck Email and Password'
+            // ], 401);
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
         }
 
         $token = $user->createToken('myapptoken')->plainTextToken;

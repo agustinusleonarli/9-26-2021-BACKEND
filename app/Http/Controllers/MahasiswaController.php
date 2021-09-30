@@ -17,7 +17,8 @@ class MahasiswaController extends Controller
      */
     public function getMahasiswa()
     {
-        $mahasiswa = Mahasiswa::orderBy('time', 'DESC')->get();
+        // Mahasiswa::orderBy('time', 'DESC')->get();
+        $mahasiswa = Mahasiswa::with('dosen') -> get();
         $response = [
             'message' => 'succes',
             'data' => $mahasiswa,
@@ -67,7 +68,8 @@ class MahasiswaController extends Controller
     public function show($id)
     {
         // menampilkan spesik data by id
-        $mahasiswa = Mahasiswa::findOrFail($id);
+        //Mahasiswa::findOrFail($id)
+        $mahasiswa = Mahasiswa::with('dosen')-> where('id',$id) ->first();
         $response = [
             'message' => 'succes',
             'data' => $mahasiswa
